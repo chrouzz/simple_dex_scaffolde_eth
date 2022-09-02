@@ -18,7 +18,9 @@ export const Events: FC<IEventsProps> = (props) => {
 
   const eventName = props.eventName;
 
+  console.log("props.contract: ", props.contract)
   const events = useEventListener(props.contract, eventName, props.startBlock);
+  console.log("special sayce: ", events)
 
   return (
     <div style={{ width: 600, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
@@ -31,7 +33,10 @@ export const Events: FC<IEventsProps> = (props) => {
             ? "🎈-->⟠ Address | Trade | AmountOut | AmountIn"
             : eventName === "LiquidityProvided"
               ? "➕ Address | Liquidity Minted | Eth In | Balloons In"
-              : "➖ Address | Liquidity Withdrawn | ETH out | Balloons Out "}
+              : eventName === "LiquidityRemoved"
+                ?"➖ Address | Liquidity Withdrawn | ETH out | Balloons Out "
+                : "Approve spending"
+                }
       </h2>
       <List
         bordered
@@ -41,6 +46,15 @@ export const Events: FC<IEventsProps> = (props) => {
             return (
               <List.Item key={item.blockNumber + "_"}>
                 No information in event
+              </List.Item>
+            );
+          }
+          else if (item.event === "Approval"){
+            return (
+              <List.Item key={item.blockNumber + "_" + item.args[0].toString()}>
+                <Address address={item.args[0]} ensProvider={props.mainnetProvider} fontSize={16} />
+                <Address address={item.args[1]} ensProvider={props.mainnetProvider} fontSize={16} />
+                <Balance address={undefined} balance={item.args[2]} />
               </List.Item>
             );
           }
